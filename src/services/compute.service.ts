@@ -34,6 +34,7 @@ export async function extractIngredients(
   try {
     const html = await RequestPromise(url);
     const $ = cheerio.load(html);
+    let image: string | null = null;
 
     $("td.align-middle", ".ingredients-table").each((index, element) => {
       let item: string | undefined = element.children[0].data;
@@ -43,9 +44,15 @@ export async function extractIngredients(
       ingredients.push(item.toLowerCase());
     });
 
+    $("img.img-fluid.mb-2", "div.col-4").each((index, element) => {
+      if (element.attribs.src.includes("https")) {
+        image = element.attribs.src;
+      }
+    });
+
     const extractedIngredients: IComputeResponse = {
       error: null,
-      data: ingredients
+      data: { ingredients, image }
     };
 
     return extractedIngredients;
@@ -64,14 +71,14 @@ export async function computeAllergy(url: string): Promise<IComputeResponse> {
     const { data, error } = res;
 
     if (error) throw error;
-
-    const ingredientsSet = new Set(data);
+    const { ingredients, image } = data;
+    const ingredientsSet = new Set(ingredients);
     const intersection = [...allergyList].filter(ingredient =>
       ingredientsSet.has(ingredient)
     );
 
     const extractedAllergy: IComputeResponse = {
-      data: intersection,
+      data: { intersection, image },
       error: null
     };
 

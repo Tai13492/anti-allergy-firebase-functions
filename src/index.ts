@@ -4,7 +4,6 @@ import loaders from "./loaders";
 
 const app = express();
 loaders({ app });
-
 app.get("/ping", (req, res) => res.send("Hello Firebase Function"));
 
 app.listen(4000, error => {

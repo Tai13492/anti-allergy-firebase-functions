@@ -7,7 +7,8 @@ export async function compute(req: Request, res: Response, next: NextFunction) {
     const computeAllergyResponse: IComputeResponse = await computeAllergy(url);
     const { error, data } = computeAllergyResponse;
     if (error) throw error;
-    res.status(200).json({ allergies: data });
+    const { intersection, image } = data;
+    res.status(200).json({ allergies: intersection, image });
   } catch (error) {
     next(error);
   }
